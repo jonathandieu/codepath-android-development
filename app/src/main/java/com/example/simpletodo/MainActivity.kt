@@ -1,6 +1,7 @@
 package com.example.simpletodo
 
 import android.os.Bundle
+import android.os.FileUtils
 import android.util.Log
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
@@ -15,9 +16,12 @@ import android.widget.EditText
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.simpletodo.databinding.ActivityMainBinding
+import java.io.File
+import java.io.IOException
+import java.nio.charset.Charset
 
 class MainActivity : AppCompatActivity() {
-    val listOfTasks = mutableListOf<String>()
+    var listOfTasks = mutableListOf<String>()
     lateinit var adapter : TaskItemAdaptor
     override fun onCreate(savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)
@@ -29,6 +33,8 @@ class MainActivity : AppCompatActivity() {
                 listOfTasks.removeAt(position)
                 // 2. Notify the adapter that something has changed in our data set
                 adapter.notifyDataSetChanged()
+
+                saveItems()
             }
 
         }
@@ -37,8 +43,10 @@ class MainActivity : AppCompatActivity() {
 //            // Any code written here will be executed when user clicks on a button
 //            Log.i("Jon", "User clicked on button")
 //        }
-        listOfTasks.add("Do laundry")
-        listOfTasks.add("Go for walk")
+//        listOfTasks.add("Do laundry")
+//        listOfTasks.add("Go for walk")
+
+        loadItems()
 
         // Look up recyclerView in layout
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
@@ -64,9 +72,36 @@ class MainActivity : AppCompatActivity() {
 
             // 3. Reset the text field so that it autoclears on every tasks
             inputTextField.setText("")
+
+            saveItems()
         }
 
+    }
 
+    // Save the data that the user has inputted
+    // Save the data by reading writing to file
 
+    // Get the file we need
+    fun getDataFile() : File {
+        // Every line is going to represent a specific task in our list of tasks
+        return File(filesDir, "data.txt")
+    }
+
+    // Load the items by reading every line in the file
+    fun loadItems() {
+        try {
+        listOfTasks = org.apache.commons.io.FileUtils.readLines(getDataFile(), Charset.defaultCharset())
+        } catch (ioException: IOException) {
+            ioException.printStackTrace()
+        }
+    }
+
+    // Save items by writing into data file
+    fun saveItems() {
+        try {
+        org.apache.commons.io.FileUtils.writeLines(getDataFile(), listOfTasks)
+        } catch (ioException: IOException) {
+            ioException.printStackTrace()
+        }
     }
 }
