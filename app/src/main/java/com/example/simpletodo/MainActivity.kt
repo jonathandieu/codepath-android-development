@@ -18,11 +18,20 @@ import com.example.simpletodo.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
     val listOfTasks = mutableListOf<String>()
-
+    lateinit var adapter : TaskItemAdaptor
     override fun onCreate(savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        val onLongClickListener = object : TaskItemAdaptor.OnLongClickListener {
+            override fun onItemLongClicked(position: Int) {
+                // 1. Remove the item from the list
+                listOfTasks.removeAt(position)
+                // 2. Notify the adapter that something has changed in our data set
+                adapter.notifyDataSetChanged()
+            }
+
+        }
         // 1. Detect when the user clicks on the add button
 //        findViewById<Button>(R.id.button).setOnClickListener {
 //            // Any code written here will be executed when user clicks on a button
@@ -34,7 +43,7 @@ class MainActivity : AppCompatActivity() {
         // Look up recyclerView in layout
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
         // Create adapter passing in the sample user data
-        val adapter = TaskItemAdaptor(listOfTasks)
+        adapter = TaskItemAdaptor(listOfTasks, onLongClickListener )
         // Attach the adapter to the recyclerview to populate items
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
